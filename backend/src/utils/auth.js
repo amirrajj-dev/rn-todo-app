@@ -1,21 +1,21 @@
-import { sign, verify } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { compare, hash } from 'bcrypt';
 import { ENV } from './env.js';
 
 const SALT_ROUNDS = 10;
 
 export const generateAccessToken = (userId) => {
-  return sign({ userId }, ENV.JWT_SECRET, { expiresIn: '1h' });
+  return jwt.sign({ userId }, ENV.JWT_SECRET, { expiresIn: '1h' });
 };
 
 export const generateRefreshToken = (userId) => {
-  return sign({ userId }, ENV.JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign({ userId }, ENV.JWT_SECRET, { expiresIn: '7d' });
 };
 
 
 export const verifyToken = (token) => {
   try {
-    return verify(token, ENV.JWT_SECRET);
+    return jwt.verify(token, ENV.JWT_SECRET);
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
       throw new Error('Token expired');
