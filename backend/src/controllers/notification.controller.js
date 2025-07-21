@@ -1,10 +1,45 @@
 import asyncHandler from "express-async-handler";
 import notificationsModel from "../models/notification.model.js";
+import todosModel from "../models/todo.model.js";
+import usersModel from "../models/user.model.js";
 
 export const getNotifications = asyncHandler(async (req, res) => {
+  const userId = req.userId;
+  const now = new Date();
+
+  // Find overdue todos for the user
+  const overdueTodos = await todosModel.find({
+    user: userId,
+    dueDate: { $lt: now },
+    completed: false,
+  });
+
+  // Create overdue notifications if they don't exist
+  for (const todo of overdueTodos) {
+    const existingNotification = await notificationsModel.findOne({
+      user: userId,
+      todoId: todo._id,
+      type: 'overdue',
+    });
+
+    if (!existingNotification) {
+      const user = await usersModel.findById(userId);
+      if (user && user.wantToGetNotification) {
+        await notificationsModel.create({
+          user: userId,
+          todoId: todo._id,
+          message: `Task "${todo.title}" is overdue! Due date was ${new Date(todo.dueDate).toLocaleDateString()}.`,
+          type: 'overdue',
+          isRead: false,
+        });
+      }
+    }
+  }
+
   const notifications = await notificationsModel
-    .find({ user: req.userId })
+    .find({ user: userId })
     .sort({ createdAt: -1 });
+
   return res.status(200).json({
     success: true,
     message: "Notifications retrieved successfully",
