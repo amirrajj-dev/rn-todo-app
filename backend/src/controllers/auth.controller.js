@@ -5,29 +5,14 @@ import refreshTokenModel from '../models/refreshToken.model.js';
 import { generateAccessToken, generateRefreshToken, comparePassword, hashPassword } from '../utils/auth.js';
 
 const avatars = [
-  'boy1.png',
-  'boy2.png',
-  'boy3.png',
-  'girl1.png',
-  'girl2.png',
-  'girl3.png',
+  'boy1.png', 'boy2.png', 'boy3.png', 'girl1.png', 'girl2.png', 'girl3.png',
 ];
 
 export const register = [
-  body('username')
-    .isLength({ min: 3 })
-    .trim()
-    .withMessage('Username must be at least 3 characters'),
-  body('email')
-    .isEmail()
-    .normalizeEmail()
-    .withMessage('Invalid email'),
-  body('password')
-    .isLength({ min: 8, max: 12 })
-    .withMessage('Password must be between 8 and 12 characters'),
-  body('gender')
-    .isIn(['male', 'female'])
-    .withMessage('Gender must be either male or female'),
+  body('username').isLength({ min: 3 }).trim().withMessage('Username must be at least 3 characters'),
+  body('email').isEmail().normalizeEmail().withMessage('Invalid email'),
+  body('password').isLength({ min: 8, max: 12 }).withMessage('Password must be between 8 and 12 characters'),
+  body('gender').isIn(['male', 'female']).withMessage('Gender must be either male or female'),
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -48,7 +33,6 @@ export const register = [
       throw error;
     }
 
-    // Assign random avatar based on gender
     const avatarOptions = gender === 'male' ? avatars.slice(0, 3) : avatars.slice(3);
     const profilePic = avatarOptions[Math.floor(Math.random() * avatarOptions.length)];
 
@@ -158,15 +142,26 @@ export const refreshToken = asyncHandler(async (req, res) => {
     throw error;
   }
 
+  // Delete used refresh token
+  await refreshTokenModel.deleteOne({ token: refreshToken });
+
+  // Generate new tokens
   const accessToken = generateAccessToken(decoded.userId);
-  return res.json({
+  const newRefreshToken = generateRefreshToken(decoded.userId);
+  await refreshTokenModel.create({
+    userId: decoded.userId,
+    token: newRefreshToken,
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+  });
+
+  return res.status(200).json({
     success: true,
     message: 'Token refreshed',
-    data: { accessToken },
+    data: { accessToken, refreshToken: newRefreshToken },
   });
 });
 
 export const logout = asyncHandler(async (req, res) => {
   await refreshTokenModel.deleteMany({ userId: req.userId });
-  return res.json({ success: true, message: 'Logged out successfully' });
+  return res.status(200).json({ success: true, message: 'Logged out successfully' });
 });

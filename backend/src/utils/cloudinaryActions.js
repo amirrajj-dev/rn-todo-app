@@ -1,4 +1,3 @@
-import fs from "fs";
 import cloudinary from "./cloudinary.js";
 
 export const uploadToCloudinary = async (

@@ -38,6 +38,9 @@ export const errorMiddleware = (err, req, res, next) => {
   } else if (err.name === 'JsonWebTokenError') {
     response.status = 401;
     response.message = 'Invalid token';
+  } else if (err.name === 'MulterError') {
+    response.status = 400;
+    response.message = err.code === 'LIMIT_FILE_SIZE' ? 'File too large' : 'File upload error';
   } else if (err.errors && Array.isArray(err.errors)) {
     response.status = 400;
     response.message = 'Validation failed';

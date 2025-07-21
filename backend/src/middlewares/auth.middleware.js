@@ -4,7 +4,9 @@ import { verifyToken } from '../utils/auth.js';
 const authMiddleware = asyncHandler(async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
-    return res.status(401).json({ success: false, message: 'No token provided' });
+    const error = new Error('No token provided');
+    error.status = 401;
+    throw error;
   }
 
   try {
@@ -12,7 +14,9 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
     req.userId = decoded.userId;
     next();
   } catch (error) {
-    return res.status(401).json({ success: false, message: error.message });
+    const err = new Error('Invalid token');
+    err.status = 401;
+    throw err;
   }
 });
 
