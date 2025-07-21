@@ -43,13 +43,18 @@ app.use("/api/auth", authRoutes);
 
 app.use(errorMiddleware);
 
-connectToDb()
-  .then(() => {
-    app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
-    });
-  })
-  .catch((err) => {
-    console.error("Failed to start server:", err);
+const startServer = async () => {
+  try {
+    await connectToDb();
+    if (ENV.NODE_ENV !== "production") {
+      app.listen(ENV.PORT, () => console.log("Server is up and running on PORT:", ENV.PORT));
+    }
+  } catch (error) {
+    console.error("Failed to start server:", error.message);
     process.exit(1);
-  });
+  }
+}
+
+startServer()
+
+export default app;
