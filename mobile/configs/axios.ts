@@ -4,7 +4,7 @@ import { clearTokens, setTokens } from "./helpers";
 
 const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_URL ||
-  "https://rn-todo-n8426xo5d-amirrajj-devs-projects.vercel.app/api";
+  "https://rn-todo-app.vercel.app/api";
 
 export interface ApiResponse<T> {
   success: boolean;
