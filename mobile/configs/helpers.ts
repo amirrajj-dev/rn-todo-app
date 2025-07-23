@@ -1,26 +1,41 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 
-// Store tokens in AsyncStorage
 const setTokens = async (
   accessToken: string,
   refreshToken: string
 ): Promise<void> => {
   try {
-    await AsyncStorage.setItem("accessToken", accessToken);
-    await AsyncStorage.setItem("refreshToken", refreshToken);
+    await SecureStore.setItemAsync("accessToken", accessToken);
+    await SecureStore.setItemAsync("refreshToken", refreshToken);
   } catch (error) {
     console.error("Error storing tokens:", error);
   }
 };
 
-// Clear tokens from AsyncStorage
 const clearTokens = async (): Promise<void> => {
   try {
-    await AsyncStorage.removeItem("accessToken");
-    await AsyncStorage.removeItem("refreshToken");
+    await SecureStore.deleteItemAsync("accessToken");
+    await SecureStore.deleteItemAsync("refreshToken");
   } catch (error) {
     console.error("Error clearing tokens:", error);
   }
 };
 
-export { setTokens, clearTokens};
+export const getTokens = async (): Promise<{
+  accessToken: string;
+  refreshToken: string;
+}> => {
+  try {
+    const accessToken = (await SecureStore.getItemAsync(
+      "accessToken"
+    )) as string;
+    const refreshToken = (await SecureStore.getItemAsync(
+      "refreshToken"
+    )) as string;
+    return { accessToken, refreshToken };
+  } catch {
+    return { accessToken: "", refreshToken: "" };
+  }
+};
+
+export { setTokens, clearTokens };

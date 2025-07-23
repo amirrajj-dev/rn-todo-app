@@ -1,6 +1,5 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { clearTokens, setTokens } from "./helpers";
+import { clearTokens, getTokens, setTokens } from "./helpers";
 
 const API_BASE_URL =
   process.env.EXPO_PUBLIC_API_URL ||
@@ -32,7 +31,7 @@ apiClient.interceptors.request.use(
   async (
     config: InternalAxiosRequestConfig
   ): Promise<InternalAxiosRequestConfig> => {
-    const accessToken = await AsyncStorage.getItem("accessToken");
+    const {accessToken} = await getTokens()
     if (accessToken) {
       config.headers = config.headers || {};
       config.headers.set("Authorization", `Bearer ${accessToken}`);
@@ -57,7 +56,7 @@ apiClient.interceptors.response.use(
     ) {
       originalRequest._retry = true;
       try {
-        const refreshToken = await AsyncStorage.getItem("refreshToken");
+        const {refreshToken} = await getTokens()
         if (!refreshToken) {
           throw new Error("No refresh token available");
         }
