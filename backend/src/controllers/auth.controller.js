@@ -65,6 +65,7 @@ export const register = [
           email: user.email,
           gender: user.gender,
           profilePic: user.profilePic,
+          wantToGetNotification : user.wantToGetNotification
         },
         accessToken,
         refreshToken,
@@ -118,6 +119,7 @@ export const login = [
           email: user.email,
           gender: user.gender,
           profilePic: user.profilePic,
+          wantToGetNotification : user.wantToGetNotification
         },
         accessToken,
         refreshToken,
