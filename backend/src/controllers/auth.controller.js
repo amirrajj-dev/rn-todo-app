@@ -2,7 +2,7 @@ import asyncHandler from 'express-async-handler';
 import { body, validationResult } from 'express-validator';
 import usersModel from '../models/user.model.js';
 import refreshTokenModel from '../models/refreshToken.model.js';
-import { generateAccessToken, generateRefreshToken, comparePassword, hashPassword } from '../utils/auth.js';
+import { generateAccessToken, generateRefreshToken, comparePassword, hashPassword, verifyToken } from '../utils/auth.js';
 
 const avatars = [
   'boy1.png', 'boy2.png', 'boy3.png', 'girl1.png', 'girl2.png', 'girl3.png',
