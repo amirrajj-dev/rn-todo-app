@@ -18,14 +18,15 @@ export const useAuth = create<AuthState>((set) => ({
   setUser: (user) => set({ user, isLoading: false }),
   initializeAuth: async () => {
     try {
-      const {accessToken} = await getTokens()
+      const { accessToken } = await getTokens();
+      console.log('initializeAuth: Access token found:', !!accessToken);
       if (!accessToken) {
+        console.log('initializeAuth: No access token, setting user to null');
         set({ user: null, isLoading: false });
-        await clearTokens();
         return;
       }
       const response = await userApi.getMe(apiClient);
-      console.log('getMe response:', response.data);
+      console.log('initializeAuth: getMe response:', response.data);
       set({ user: response.data.data, isLoading: false });
     } catch (error: any) {
       console.error('initializeAuth error:', {
@@ -33,18 +34,16 @@ export const useAuth = create<AuthState>((set) => ({
         status: error.response?.status,
         responseData: error.response?.data,
       });
+      // Only clear tokens if refresh fails explicitly (handled in axios.ts)
       set({ user: null, isLoading: false });
-      await clearTokens();
-    }finally{
-      set({ isLoading: false });
     }
   },
   logout: async () => {
     try {
+      set({isLoading : true})
       await authApi.logout(apiClient);
-      console.log('Logout successful');
     } catch (error: any) {
-      console.error('Logout error:', {
+      console.error('logout error:', {
         message: error.message,
         status: error.response?.status,
         responseData: error.response?.data,
@@ -55,5 +54,3 @@ export const useAuth = create<AuthState>((set) => ({
     }
   },
 }));
-
-// React Query hook for fetching user

@@ -23,6 +23,7 @@ import {
   validatePassword,
   validateUsername,
 } from "@/validations/validations";
+import MyModal from "@/components/modal/MyModal";
 
 const Index = () => {
   const { theme } = useTheme();
@@ -40,7 +41,9 @@ const Index = () => {
     password: "",
     gender: "",
   });
+  const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleBlur = (field: keyof typeof errors) => {
     let error = "";
@@ -51,9 +54,9 @@ const Index = () => {
     setErrors((prev) => ({ ...prev, [field]: error }));
   };
 
-  const handleFocus = (field : keyof typeof errors)=>{
+  const handleFocus = (field: keyof typeof errors) => {
     setErrors((prev) => ({ ...prev, [field]: "" }));
-  }
+  };
 
   const handleSignup = async () => {
     const usernameError = validateUsername(username.trim());
@@ -86,11 +89,8 @@ const Index = () => {
       setUser(user);
       router.push("/(tabs)");
     } catch (error: any) {
-      Alert.alert(
-        "Error",
-        error.response?.data.message ||
-          "Signup failed. Please check your network or try again."
-      );
+      setErrorMessage(error.response.data.message)
+      setIsModalOpen(true);
     } finally {
       setLoading(false);
     }
@@ -128,7 +128,7 @@ const Index = () => {
             value={username}
             onChangeText={setUsername}
             onBlur={() => handleBlur("username")}
-            onFocus={()=>handleFocus("username")}
+            onFocus={() => handleFocus("username")}
             autoCapitalize="none"
           />
           {errors.username ? (
@@ -149,7 +149,7 @@ const Index = () => {
             value={email}
             onChangeText={setEmail}
             onBlur={() => handleBlur("email")}
-            onFocus={()=>handleFocus("email")}
+            onFocus={() => handleFocus("email")}
             keyboardType="email-address"
             autoCapitalize="none"
           />
@@ -171,7 +171,7 @@ const Index = () => {
             value={password}
             onChangeText={setPassword}
             onBlur={() => handleBlur("password")}
-            onFocus={()=>handleFocus("password")}
+            onFocus={() => handleFocus("password")}
             secureTextEntry
             autoCapitalize="none"
           />
@@ -194,7 +194,7 @@ const Index = () => {
               setGender(value as "male" | "female");
               handleBlur("gender");
             }}
-            onFocus={()=>handleFocus("gender")}
+            onFocus={() => handleFocus("gender")}
             style={{
               color: theme === "dark" ? "#FFFFFF" : "#1F2937",
               fontSize: 16,
@@ -247,6 +247,14 @@ const Index = () => {
           </Text>
         </TouchableOpacity>
       </Animatable.View>
+      <MyModal
+        title="Error"
+        description={errorMessage}
+        isOpen={isModalOpen}
+        handleClose={() => setIsModalOpen(false)}
+        cancelBtnText="Ok"
+        haveConfirmBtn={false}
+      />
     </SafeAreaView>
   );
 };

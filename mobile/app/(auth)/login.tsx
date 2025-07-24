@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/store/theme.store';
@@ -10,13 +10,16 @@ import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Animatable from 'react-native-animatable';
 import { validateEmail, validatePassword } from '@/validations/validations';
+import MyModal from '@/components/modal/MyModal';
 
 const Login = () => {
   const { theme } = useTheme();
   const { setUser } = useAuth();
+  const [isModalOpen , setIsModalOpen] = useState(false)
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [errors, setErrors] = useState({
     email: '',
     password: '',
@@ -29,9 +32,10 @@ const Login = () => {
     if (field === 'password') error = validatePassword(password);
     setErrors((prev) => ({ ...prev, [field]: error }));
   };
-   const handleFocus = (field : keyof typeof errors)=>{
-    setErrors((prev) => ({ ...prev, [field]: "" }));
-  }
+
+  const handleFocus = (field: keyof typeof errors) => {
+    setErrors((prev) => ({ ...prev, [field]: '' }));
+  };
 
   const handleLogin = async () => {
     const emailError = validateEmail(email);
@@ -43,20 +47,22 @@ const Login = () => {
     });
 
     if (emailError || passwordError) {
-      Alert.alert('Error', 'Please fix the errors in the form');
+      setErrorMessage('Please fix the errors in the form');
+      setIsModalOpen(true);
       return;
     }
 
     setLoading(true);
     try {
-      console.log('Sending login request:', { email });
       const response = await authApi.login(apiClient, { email, password });
       const { accessToken, refreshToken, user } = response.data.data;
       await setTokens(accessToken, refreshToken);
       setUser(user);
       router.push('/(tabs)');
     } catch (error: any) {
-      Alert.alert('Error', error.response?.data.message || 'Login failed');
+      console.log("error => " , error.response.data.message)
+      setErrorMessage(error.response.data.message);
+      setIsModalOpen(true);
     } finally {
       setLoading(false);
     }
@@ -86,7 +92,7 @@ const Login = () => {
             value={email}
             onChangeText={setEmail}
             onBlur={() => handleBlur('email')}
-            onFocus={()=>handleFocus("email")}
+            onFocus={() => handleFocus('email')}
             keyboardType="email-address"
             autoCapitalize="none"
           />
@@ -108,7 +114,7 @@ const Login = () => {
             value={password}
             onChangeText={setPassword}
             onBlur={() => handleBlur('password')}
-            onFocus={()=>handleFocus("password")}
+            onFocus={() => handleFocus('password')}
             secureTextEntry
             autoCapitalize="none"
           />
@@ -129,7 +135,7 @@ const Login = () => {
           disabled={loading}
         >
           <Text className="text-white text-center font-semibold text-lg">
-            {loading ? <ActivityIndicator color={"#fff"} /> : 'Log In'}
+            {loading ? <ActivityIndicator color="#fff" /> : 'Log In'}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity className="mt-6" onPress={() => router.push('/(auth)')}>
@@ -138,6 +144,16 @@ const Login = () => {
           </Text>
         </TouchableOpacity>
       </Animatable.View>
+      <MyModal
+        title="Error"
+        description={errorMessage}
+        haveCancelBtn={true}
+        haveConfirmBtn={false}
+        handleClose={()=>setIsModalOpen(false)}
+        isLoading={loading}
+        isOpen={isModalOpen} 
+        cancelBtnText='Ok'
+      />
     </SafeAreaView>
   );
 };
