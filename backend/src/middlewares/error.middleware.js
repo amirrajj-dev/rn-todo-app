@@ -50,7 +50,7 @@ export const errorMiddleware = (err, req, res, next) => {
     }));
   } else {
     response.status = err.status || 500;
-    response.message = ENV.NODE_ENV === 'production' ? 'Internal Server Error' : err.message;
+    response.message = err.message;
   }
 
   res.status(response.status).json(response);
