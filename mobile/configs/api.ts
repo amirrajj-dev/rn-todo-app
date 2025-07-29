@@ -1,4 +1,4 @@
-import { Todo, User } from "@/interfaces/entities";
+import { Todo, User , Notification } from "@/interfaces/entities";
 import { AxiosInstance } from "axios";
 import { ApiResponse } from "./axios";
 

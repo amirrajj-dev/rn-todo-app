@@ -7,6 +7,7 @@ import { useTodoFilter } from '@/store/todoFilter.store';
 import TodoItem from './TodoItem';
 import SkeletonLoader from '@/components/skeletons/SkeletonLoader';
 import NoTodoFound from './NoTodoFound';
+import Error from '@/components/error/Error';
 
 const TodoList = () => {
   const { theme } = useTheme();
@@ -51,25 +52,7 @@ const TodoList = () => {
   }
 
   if (error) {
-    return (
-      <View className="items-center justify-center py-6">
-        <Animatable.View
-          className={`w-11/12 max-w-md p-6 rounded-2xl ${
-            theme === 'dark' ? 'bg-gray-800/80' : 'bg-white/80'
-          } shadow-xl border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}
-          animation="fadeInUp"
-          duration={1000}
-        >
-          <Text
-            className={`text-lg font-semibold text-center ${
-              theme === 'dark' ? 'text-white' : 'text-gray-800'
-            }`}
-          >
-            Failed to load todos
-          </Text>
-        </Animatable.View>
-      </View>
-    );
+    return <Error title='Todos' />
   }
 
   if (!filteredTodos || filteredTodos.length === 0) {
