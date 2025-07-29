@@ -14,6 +14,15 @@ const priorityFilters: {
   { label: "High", value: "high" },
 ];
 
+export const notificationsFilter : {
+  label: string;
+  value: "all" | "seen" | "notSeen";
+}[] = [
+  { label: "All", value: "all" },
+  { label: "Seen", value: "seen" },
+  { label: "Not Seen", value: "notSeen" }
+]
+
 const motivationalQuotes = [
   "Small steps lead to big results. 🚀",
   "Done is better than perfect. ✅",
