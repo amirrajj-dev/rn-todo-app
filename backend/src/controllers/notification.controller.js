@@ -95,3 +95,24 @@ export const deleteNotification = asyncHandler(async (req, res) => {
     data: deletedNotification,
   });
 });
+
+export const markAllNotificationsAsRead = asyncHandler(async (req , res)=>{
+  const {userId} = req
+  if (!userId){
+    const error = new Error("User ID is required");
+    error.status = 400;
+    throw error;
+  }
+  const notifications = await notificationsModel.updateMany({user:userId},{isRead:true})
+  if (!notifications){
+    const error = new Error("Notifications not found or you do not have permission");
+    error.status = 404;
+    throw error;
+  }
+  const updatedNotifications = await notificationsModel.find({ user: userId });
+  return res.status(200).json({
+    success: true,
+    message: "All notifications marked as read successfully",
+    data: updatedNotifications
+  })
+})

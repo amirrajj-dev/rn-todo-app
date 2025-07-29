@@ -1,9 +1,9 @@
-import { Todo, User , Notification } from "@/interfaces/entities";
+import { Todo, User, Notification } from "@/interfaces/entities";
 import { AxiosInstance } from "axios";
 import { ApiResponse } from "./axios";
 
-type SignUpUserDto = User & {password : string} 
-type SignInUserDto = User & {password  : string}
+type SignUpUserDto = User & { password: string };
+type SignInUserDto = User & { password: string };
 
 const authApi = {
   signup: (
@@ -64,6 +64,8 @@ const notificationApi = {
     api.put<ApiResponse<Notification>>(`/notifications/${id}`, {}),
   deleteNotification: (api: AxiosInstance, id: string) =>
     api.delete<ApiResponse<Notification>>(`/notifications/${id}`),
+  markAllAsRead: (api: AxiosInstance) =>
+    api.put<ApiResponse<Notification[]>>("/notifications/mark-all-read"),
 };
 
 const todoApi = {
