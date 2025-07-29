@@ -66,7 +66,8 @@ const notificationApi = {
     api.delete<ApiResponse<Notification>>(`/notifications/${id}`),
   markAllAsRead: (api: AxiosInstance) =>
     api.put<ApiResponse<Notification[]>>("/notifications/mark-all-read"),
-};
+  deleteAllNotifications : (api : AxiosInstance)=>api.delete<ApiResponse<void>>("/notifications/all")
+}
 
 const todoApi = {
   createTodo: (
