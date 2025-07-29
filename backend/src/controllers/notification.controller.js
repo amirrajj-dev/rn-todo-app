@@ -116,3 +116,23 @@ export const markAllNotificationsAsRead = asyncHandler(async (req , res)=>{
     data: updatedNotifications
   })
 })
+
+export const deleteAllNotifications = asyncHandler(async (req , res)=>{
+  const {userId} = req
+  if (!userId){
+    const error = new Error("User ID is required");
+    error.status = 400;
+    throw error;
+  }
+  const notifications = await notificationsModel.deleteMany({user:userId})
+  if (!notifications){
+    const error = new Error("Notifications not found or you do not have permission");
+    error.status = 404;
+    throw error;
+  }
+  return res.status(200).json({
+    success: true,
+    message: "All notifications deleted successfully",
+    data : []
+  })
+})
