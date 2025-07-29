@@ -13,8 +13,8 @@ const router = Router();
 router.use(authMiddleware)
 
 router.get("/", getNotifications);
-router.put("/:id", markNotificationAsRead);
 router.put("/mark-all-read" , markAllNotificationsAsRead)
+router.put("/:id", markNotificationAsRead);
 router.delete("/:id", deleteNotification);
 
 export default router;
