@@ -109,7 +109,7 @@ export const markAllNotificationsAsRead = asyncHandler(async (req , res)=>{
     error.status = 404;
     throw error;
   }
-  const updatedNotifications = await notificationsModel.find({ user: userId });
+  const updatedNotifications = await notificationsModel.find({ user: userId }).sort({createdAt: -1});
   return res.status(200).json({
     success: true,
     message: "All notifications marked as read successfully",
