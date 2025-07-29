@@ -22,6 +22,7 @@ export const useCreateTodo = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todos'] });
+      queryClient.invalidateQueries({queryKey : ["notifications"]});
       setModal({
         modalType: 'success',
         description: 'Todo created successfully',
