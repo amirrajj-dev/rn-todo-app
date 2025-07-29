@@ -1,12 +1,74 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, ScrollView } from 'react-native';
+import React from 'react';
+import * as Animatable from 'react-native-animatable';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useTheme } from '@/store/theme.store';
+import { useNotfications } from "@/queries/useNotifications"
+import Notification from '@/components/notifications/ui/Notification';
+import NotificationSkeleton from '@/components/notifications/ui/NotificationSkeleton';
+import { useTodoModal } from '@/store/todoModal.store';
+import MyModal from '@/components/modal/MyModal';
+import NoNotificationFound from '@/components/notifications/ui/NoNotificationFound';
+import Error from '@/components/error/Error';
 
 const Notifications = () => {
-  return (
-    <View>
-      <Text>Notifications</Text>
-    </View>
-  )
-}
+  const { theme } = useTheme();
+  const { data: notifications, isLoading, error } = useNotfications();
+  const { setModal, isOpen, modalType, modalTitle, modalDescription } = useTodoModal();
 
-export default Notifications
+  if (isLoading) {
+    return (
+      <View className={`flex-1 p-4 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+        <NotificationSkeleton/>
+      </View>
+    );
+  }
+
+  if (error) {
+    return <Error title='Notifications'/>
+  }
+
+  if (!notifications || notifications.length === 0) {
+    return <NoNotificationFound/>
+  }
+
+  return (
+    <View
+      className={`flex-1 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}
+    >
+      <LinearGradient
+        colors={theme === 'dark' ? ['#1F2937', '#111827'] : ['#F3F4F6', '#E5E7EB']}
+        className="absolute inset-0"
+      />
+      <ScrollView contentContainerStyle={{ paddingBottom: 80, paddingTop: 16 }}>
+        <View className="px-4">
+          <Animatable.Text
+            className={`text-3xl font-extrabold mb-4 text-center ${
+              theme === 'dark' ? 'text-white' : 'text-gray-800'
+            }`}
+            animation="fadeInUp"
+            duration={1000}
+          >
+            Notifications
+          </Animatable.Text>
+          {notifications.map((notification) => {
+            return (
+           <Notification key={notification._id} notification={notification}/>
+          )
+          })}
+        </View>
+      </ScrollView>
+       <MyModal
+        title={modalTitle}
+        description={modalDescription}
+        haveCancelBtn={modalType === 'success' || modalType === 'error'}
+        haveConfirmBtn={false}
+        cancelBtnText="OK"
+        isOpen={isOpen && (modalType === 'success' || modalType === 'error')}
+        handleClose={() => setModal({ modalType: null })}
+      />
+    </View>
+  );
+};
+
+export default Notifications;
